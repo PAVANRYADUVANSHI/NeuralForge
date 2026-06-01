@@ -1,0 +1,116 @@
+type Query {
+    me: User
+    myFeatures(page: Int, size: Int): FeaturePage!
+    myBugPredictions(page: Int, size: Int): BugPredictionPage!
+    featureById(id: ID!): AIFeatureRequest
+    systemStats: SystemStats!
+}
+
+type Mutation {
+    generateFeature(intent: String!): AIFeatureRequest!
+    analyzeCode(filePath: String!, fileContent: String!): BugPrediction!
+    reviewCode(code: String!, language: String!): CodeReview!
+    storeDecision(title: String!, context: String!, decision: String!, rationale: String!): CodeDecision!
+}
+
+type Subscription {
+    aiProgress(requestId: ID!): ProgressUpdate!
+    liveCodeSuggestions: AISuggestion!
+    systemAlerts: SystemAlert!
+}
+
+type User {
+    id: ID!
+    username: String!
+    email: String!
+    role: String!
+    aiCredits: Int!
+    totalFeaturesGenerated: Int!
+    totalBugsPredicted: Int!
+    createdAt: String!
+}
+
+type AIFeatureRequest {
+    id: ID!
+    intent: String!
+    status: String!
+    generatedFiles: [String!]
+    generatedCode: String
+    tokensUsed: Int
+    processingTimeMs: Long
+    createdAt: String!
+}
+
+type BugPrediction {
+    id: ID!
+    filePath: String!
+    totalBugsFound: Int!
+    criticalBugs: Int!
+    predictions: [BugPredictionItem!]!
+    analyzedAt: String!
+}
+
+type BugPredictionItem {
+    lineNumber: Int!
+    bugType: String!
+    severity: String!
+    confidenceScore: Float!
+    description: String!
+    suggestedFix: String!
+}
+
+type CodeReview {
+    architectFeedback: String!
+    securityFeedback: String!
+    performanceFeedback: String!
+    overallScore: Int!
+}
+
+type CodeDecision {
+    id: ID!
+    title: String!
+    context: String!
+    decision: String!
+    rationale: String!
+    createdAt: String!
+}
+
+type FeaturePage {
+    content: [AIFeatureRequest!]!
+    totalElements: Long!
+    totalPages: Int!
+}
+
+type BugPredictionPage {
+    content: [BugPrediction!]!
+    totalElements: Long!
+    totalPages: Int!
+}
+
+type ProgressUpdate {
+    requestId: ID!
+    status: String!
+    message: String!
+}
+
+type AISuggestion {
+    suggestion: String!
+    type: String!
+    timestamp: Long!
+}
+
+type SystemAlert {
+    level: String!
+    message: String!
+    timestamp: Long!
+}
+
+type SystemStats {
+    totalUsers: Long!
+    totalFeaturesGenerated: Long!
+    totalBugsPredicted: Long!
+    aiCreditsUsedToday: Long!
+    systemHealth: String!
+}
+
+scalar Long

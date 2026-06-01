@@ -1,0 +1,22 @@
+# NeuralForge
+node_modules/
+dist/
+build/
+target/
+*.log
+.env
+.DS_Store
+*.class
+*.jar
+*.war
+.idea/
+.vscode/
+*.iml
+.gradle/
+out/
+*.swp
+*.swo
+.terraform/
+*.tfstate
+*.tfstate.backup
+.terraform.lock.hcl

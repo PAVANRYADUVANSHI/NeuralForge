@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-neural-950 text-gray-100 font-mono;
+  }
+}
+
+@layer components {
+  .neural-card {
+    @apply bg-neural-900/50 backdrop-blur-xl border border-neural-700/50 rounded-xl p-6 shadow-2xl;
+  }
+  
+  .neural-button {
+    @apply bg-gradient-to-r from-neural-600 to-forge-600 hover:from-neural-500 hover:to-forge-500 
+           text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 
+           shadow-lg hover:shadow-neural-500/50 active:scale-95;
+  }
+  
+  .neural-input {
+    @apply bg-neural-900/80 border border-neural-700 rounded-lg px-4 py-3 
+           focus:outline-none focus:ring-2 focus:ring-neural-500 focus:border-transparent
+           placeholder-gray-500 transition-all;
+  }
+  
+  .code-block {
+    @apply bg-black/50 border border-neural-800 rounded-lg p-4 font-mono text-sm overflow-x-auto;
+  }
+  
+  .glow-text {
+    @apply text-transparent bg-clip-text bg-gradient-to-r from-neural-400 to-forge-400;
+  }
+}
+
+.neural-grid-bg {
+  background-image: 
+    linear-gradient(rgba(99, 102, 241, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99, 102, 241, 0.1) 1px, transparent 1px);
+  background-size: 50px 50px;
+}

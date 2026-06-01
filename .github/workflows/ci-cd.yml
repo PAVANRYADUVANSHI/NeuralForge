@@ -1,0 +1,87 @@
+name: NeuralForge CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+      - name: Build Backend
+        run: |
+          cd backend
+          mvn clean package -DskipTests
+      - name: Run Tests
+        run: |
+          cd backend
+          mvn test
+      - name: Build Docker Image
+        run: |
+          cd backend
+          docker build -t neuralforge/backend:${{ github.sha }} .
+      - name: Push to Registry
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+          docker push neuralforge/backend:${{ github.sha }}
+
+  ai-engine-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+      - name: Build AI Engine
+        run: |
+          cd ai-engine
+          mvn clean package -DskipTests
+      - name: Build Docker Image
+        run: |
+          cd ai-engine
+          docker build -t neuralforge/ai-engine:${{ github.sha }} .
+
+  frontend-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Build Frontend
+        run: |
+          cd frontend
+          npm ci
+          npm run build
+      - name: Build Docker Image
+        run: |
+          cd frontend
+          docker build -t neuralforge/frontend:${{ github.sha }} .
+
+  deploy:
+    needs: [backend-build, ai-engine-build, frontend-build]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - name: Deploy to EKS
+        run: |
+          aws eks update-kubeconfig --name neuralforge-cluster
+          kubectl apply -f infrastructure/k8s/
+          kubectl rollout restart deployment/neuralforge-backend -n neuralforge
+          kubectl rollout restart deployment/neuralforge-frontend -n neuralforge

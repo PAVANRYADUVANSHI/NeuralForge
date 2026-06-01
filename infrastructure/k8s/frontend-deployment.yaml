@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: neuralforge-frontend
+  namespace: neuralforge
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: neuralforge-frontend
+  template:
+    metadata:
+      labels:
+        app: neuralforge-frontend
+    spec:
+      containers:
+      - name: frontend
+        image: neuralforge/frontend:latest
+        ports:
+        - containerPort: 3000
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: neuralforge-frontend-service
+  namespace: neuralforge
+spec:
+  selector:
+    app: neuralforge-frontend
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 3000
+  type: LoadBalancer

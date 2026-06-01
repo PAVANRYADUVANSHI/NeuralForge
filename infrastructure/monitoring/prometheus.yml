@@ -1,0 +1,26 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'neuralforge-backend'
+    static_configs:
+      - targets: ['backend:8080']
+    metrics_path: '/actuator/prometheus'
+
+  - job_name: 'neuralforge-ai-engine'
+    static_configs:
+      - targets: ['ai-engine:8090']
+    metrics_path: '/actuator/prometheus'
+
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres:5432']
+
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+
+  - job_name: 'kafka'
+    static_configs:
+      - targets: ['kafka:9092']
